@@ -19,10 +19,10 @@ flowchart LR
 ## Introduction
 
 Building a comprehensive transposable element (TE) library is a critical first step for accurate genome annotation and evolutionary analyses. 
-Although **RepeatModeler** is widely used for de novo TE discovery, its output typically contains a mixture of known TE families, 
-fragmented consensus sequences, gene fragments, simple repeats, and other non-TE sequences. Consequently, substantial manual curation is usually required before the resulting library can be used for RepeatMasker or comparative analyses.The objective of this workflow is not to replace expert curation, but to substantially reduce the number of sequences requiring manual inspection while maximizing the recovery of bona fide TE families.
+Although RepeatModeler is widely used for de novo TE discovery, its output typically contains a mixture of known TE families, 
+fragmented consensus sequences, gene fragments, simple repeats, and other non-TE sequences. Consequently, substantial manual curation is usually required before the resulting library can be used for RepeatMasker or comparative analyses. The objective of this workflow is not to replace expert curation, but to substantially reduce the number of sequences requiring manual inspection while maximizing the recovery of bona fide TE families.
 
-This pipeline was developed to automate the identification of **high-confidence candidate TE families** across multiple genome assemblies of the same species while minimizing the amount of manual curation required. Rather than attempting to recover every possible repetitive sequence, the workflow is intentionally conservative and prioritizes candidates with strong evidence of representing bona fide canonical TEs. 
+This pipeline was developed to automate the identification of high-confidence candidate TE families across multiple genome assemblies of the same species while minimizing the amount of manual curation required, raather than attempting to recover every possible repetitive sequence.
 
 In addition, by analysing multiple genome assemblies simultaneously, the pipeline aims to recover a good consensus sequence for each TE family present in the species rather then a consensus for each strain. Because the resulting library represents species-level consensus sequences rather than strain-specific variants, it is particularly well suited for genome annotation and comparative analyses across multiple assemblies. However, analyses that rely on precise sequence divergence from strain-specific consensuses, such as RepeatMasker landscape analyses used to infer the relative ages of TE insertions, may be influenced by this approach.
 
@@ -41,7 +41,7 @@ This workflow is intended for analyses of multiple genome assemblies belonging t
 
 The pipeline assumes that:
 
-- a reasonably complete curated TE library already exists for the species;
+- a curated TE library already exists for the species (This can be obtained from Repbase depending on the species. In this case, LTRs should be joined to the internal region)
 - RepeatModeler consensus sequences are frequently fragmented or incomplete relative to curated TE consensuses;
 - canonical TE families are expected to retain detectable nucleotide and/or protein similarity to previously described TEs;
 - the objective is to expand an existing curated TE library, identifying bona-fide TEs rather than discover every repetitive sequence present in the genome.
