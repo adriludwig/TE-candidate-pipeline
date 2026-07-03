@@ -61,12 +61,7 @@ This workflow is intended for analyses of multiple genome assemblies belonging t
 
 The pipeline assumes that:
 
-- a curated TE library already exists for the species. This can be obtained from Repbase depending on the species. In this case, LTRs should be joined to the internal region. For species without an available curated TE library, this filtering step can be effectively skipped by providing a FASTA file containing a single dummy sequence. In this case, all RepeatModeler candidate families are retained for downstream analyses. 
-  Example:
-```fasta
->dummy_TE
-NNNNNNNNNN
-```
+- a curated TE library already exists for the species. 
 - RepeatModeler consensus sequences are frequently fragmented or incomplete relative to curated TE consensuses;
 - canonical TE families are expected to retain detectable nucleotide and/or protein similarity to previously described TEs;
 - the objective is identifying bona-fide TEs rather than discover every repetitive sequence present in the genome.
@@ -81,6 +76,12 @@ The pipeline starts from:
 
 1. genome FASTA files;
 2. a curated TE library for the species or species group;
+This can be obtained from Repbase depending on the species. In this case, LTRs should be joined to the internal region. For species without an available curated TE library, this filtering step can be effectively skipped by providing a FASTA file containing a single dummy sequence. In this case, all RepeatModeler candidate families are retained for downstream analyses. 
+  Example:
+```fasta
+>dummy_TE
+NNNNNNNNNN
+```
 3. a RepBase nucleotide library for final BLASTN searches;
 4. a TE peptide library, such as RepeatPeps.lib, for final BLASTX searches;
 5. a BUSCO lineage suitable for the organism being analysed.
