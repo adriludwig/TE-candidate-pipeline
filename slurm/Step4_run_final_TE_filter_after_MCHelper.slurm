@@ -3,8 +3,11 @@ set -euo pipefail
 
 step_start="$(date +%s)"
 
-SLURM_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-PROJECT_DIR="$(cd "${SLURM_DIR}/.." && pwd)"
+# The launcher submits this job with --chdir set to the project directory.
+# Do not derive paths from BASH_SOURCE here: SLURM copies submitted scripts to
+# a spool directory before execution.
+PROJECT_DIR="${PROJECT_DIR:-$(pwd -P)}"
+SLURM_DIR="${PROJECT_DIR}/slurm"
 
 cd "${PROJECT_DIR}"
 source "${PROJECT_DIR}/config.sh"
