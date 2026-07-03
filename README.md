@@ -16,6 +16,26 @@ flowchart LR
 ```
 # TE Candidate Discovery Pipeline
 
+## Contents
+
+- [Pipeline overview](#pipeline-overview)
+- [Introduction](#introduction)
+- [Pipeline assumptions](#pipeline-assumptions)
+- [Required data](#required-data)
+- [Workflow summary](#workflow-summary)
+- [Dependencies](#dependencies)
+- [Installation](#installation)
+- [Repository layout](#repository-layout)
+- [Configure the pipeline](#configure-the-pipeline)
+- [Configure software environments](#configure-software-environments)
+- [Verify dependencies](#verify-dependencies-recommended)
+- [Run the pipeline](#run-the-pipeline)
+- [Step outputs](#step-outputs)
+- [Quick checks](#quick-checks)
+- [Final curation](#final-curation)
+- [Limitations](#limitations)
+- [References](#references)
+
 ## Introduction
 
 Building a comprehensive transposable element (TE) library is a critical first step for accurate genome annotation and evolutionary analyses. 
