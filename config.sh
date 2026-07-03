@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 # Configuration file for the TE candidate discovery pipeline.
 #
+
+VERSION="1.1"
+
 ###############################################################################
 # Project directory
 ###############################################################################
@@ -201,6 +204,37 @@ REPEATMODELER_USE_LTRSTRUCT="yes"
 
 MCHELPER_X="2"
 MCHELPER_EXTENSION="2000"
+
+###############################################################################
+# SLURM settings
+###############################################################################
+# These values are used only by slurm/run_pipeline_slurm.sh.
+# Leave SLURM_PARTITION empty to use the cluster default partition.
+# Leave memory or time values empty to use the cluster defaults.
+#
+# ARRAY_CONCURRENCY controls how many array tasks can run at the same time.
+# Example: ARRAY_CONCURRENCY="3" submits arrays as 1-N%3.
+# Leave it empty to let SLURM use the cluster default.
+
+SLURM_PARTITION=""
+
+STEP1_CPUS=""
+STEP1_MEM=""
+STEP1_TIME=""
+
+STEP2_CPUS=""
+STEP2_MEM=""
+STEP2_TIME=""
+
+STEP3_CPUS=""
+STEP3_MEM=""
+STEP3_TIME=""
+
+STEP4_CPUS=""
+STEP4_MEM=""
+STEP4_TIME=""
+
+ARRAY_CONCURRENCY=""
 
 ###############################################################################
 # Software environments

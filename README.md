@@ -138,16 +138,29 @@ Required input reference files:
 - TE peptide library, such as `RepeatPeps.lib`, for final BLASTX searches
 - BUSCO HMM lineage file for MCHelper
 
-## File Layout
+### SLURM Mode
 
-Use one run directory for each analysis. Put the pipeline scripts and `config.sh` in that directory. Output folders will also be created there.
+The SLURM execution mode also requires the `sbatch` command and a working SLURM scheduler.
 
-Example:
+## Installation
+
+Clone the repository:
+
+```bash
+
+git clone https://github.com/adriludwig/TE-candidate-pipeline.git
+cd TE-candidate-pipeline
+
+```
+## Repository Layout
+
+After cloning the repository, the directory should look like:
 
 ```text
-my_TE_run/
+TE-candidate-pipeline/
 ├── README.md
 ├── config.sh
+├── check_dependencies.sh
 ├── run_TE_pipeline.sh
 ├── 00_prepare_genome_table.sh
 ├── 02_prepare_mchelper_table.sh
@@ -156,15 +169,16 @@ my_TE_run/
 ├── Step3_run_mchelper_loop.sh
 ├── Step4_run_final_TE_filter_after_MCHelper.sh
 ├── TE_candidate_pipeline_original_headers.sh
-├── genome1.fna
-├── genome2.fna
-├── Curated_TE_lib1.0.fa
-└── db/
-    ├── RepBase31.06.fasta/RepBase31.06.fasta
-    └── RepeatPeps.lib
+└── slurm/
+    ├── README.md
+    ├── run_pipeline_slurm.sh
+    ├── Step1_run_repeatmodeler_array.slurm
+    ├── Step2_run_TE_candidates_original_headers.slurm
+    ├── Step3_run_mchelper_array.slurm
+    └── Step4_run_final_TE_filter_after_MCHelper.slurm
 ```
 
-Genome FASTA files can also be stored in another directory. In that case, set `GENOME_DIR` in `config.sh` to the full path where the genome FASTA files are stored.
+Input genomes, the curated TE library and the required databases can be stored anywhere on your system. Their locations should be specified in `config.sh`.
 
 ## Configure the Pipeline
 
@@ -235,18 +249,54 @@ load_repeatmodeler_environment() {
 
 Use the same pattern for the filtering and MCHelper environments. The `set +u` and `set -u` lines are intentional because some conda activation scripts use variables that may be undefined under strict Bash mode.
 
+
+## Verify dependencies (recommended)
+
+Before running the pipeline, verify that all required software and environments are correctly configured:
+
+```bash
+bash check_dependencies.sh
+```
+
+If all dependencies are available, you should see:
+
+```text
+All required dependencies were found.
+The pipeline is ready to run.
+```
+
 ## Run the Pipeline
 
-From the run directory:
+The repository supports two execution modes.
+
+### Local Bash Mode
+
+Use this mode for small tests, interactive compute nodes, or clusters where you do not want to submit SLURM jobs.
 
 ```bash
 bash run_TE_pipeline.sh
 ```
 
-The wrapper writes a timestamped log file in:
+### SLURM Mode
+
+Use this mode on SLURM clusters. The launcher submits RepeatModeler and MCHelper as arrays and submits later steps with job dependencies.
+
+```bash
+bash slurm/run_pipeline_slurm.sh
+```
+
+SLURM resources are configured in the `SLURM settings` section of `config.sh`. The SLURM scripts are examples and may require adaptation to local HPC policies, for example account names, QoS names, modules, or partition names.
+
+Both execution modes write logs in:
 
 ```text
 logs/
+```
+
+SLURM job logs are written in:
+
+```text
+logs/slurm/
 ```
 
 The pipeline creates these output directories:
