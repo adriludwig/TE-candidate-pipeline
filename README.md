@@ -20,7 +20,6 @@ flowchart LR
 
 - [Pipeline overview](#pipeline-overview)
 - [Introduction](#introduction)
-- [Pipeline assumptions](#pipeline-assumptions)
 - [Required data](#required-data)
 - [Workflow summary](#workflow-summary)
 - [Dependencies](#dependencies)
@@ -31,42 +30,32 @@ flowchart LR
 - [Verify dependencies](#verify-dependencies-recommended)
 - [Run the pipeline](#run-the-pipeline)
 - [Step outputs](#step-outputs)
-- [Quick checks](#quick-checks)
 - [Final curation](#final-curation)
 - [Limitations](#limitations)
 - [References](#references)
 
 ## Introduction
 
-Building a comprehensive transposable element (TE) library is a critical first step for accurate genome annotation and evolutionary analyses. 
-Although RepeatModeler is widely used for de novo TE discovery, its output typically contains a mixture of known TE families, 
-fragmented consensus sequences, gene fragments, simple repeats, and other non-TE sequences. Consequently, substantial manual curation is usually required before the resulting library can be used for RepeatMasker or comparative analyses. The objective of this workflow is not to replace expert curation, but to substantially reduce the number of sequences requiring manual inspection while maximizing the recovery of bona fide TE families.
+Building a comprehensive transposable element (TE) library is a critical first step for accurate genome annotation. Although RepeatModeler is widely used for de novo TE discovery, its output typically contains a mixture of known TE families, 
+fragmented consensus sequences, gene fragments, simple repeats, and other non-TE sequences. Consequently, substantial manual curation is usually required before the resulting library can be used for proper annotation of the TEs in the genomes. 
 
-This pipeline was developed to automate the identification of high-confidence candidate TE families across multiple genome assemblies of the same species while minimizing the amount of manual curation required, raather than attempting to recover every possible repetitive sequence.
+This pipeline was developed to automate the identification of high-confidence candidate TE families across multiple genome assemblies of the same species while minimising the amount of manual curation required.
 
-In addition, by analysing multiple genome assemblies simultaneously, the pipeline aims to recover a good consensus sequence for each TE family present in the species rather then a consensus for each strain. Because the resulting library represents species-level consensus sequences rather than strain-specific variants, it is particularly well suited for genome annotation and comparative analyses across multiple assemblies. However, analyses that rely on precise sequence divergence from strain-specific consensuses, such as RepeatMasker landscape analyses used to infer the relative ages of TE insertions, may be influenced by this approach.
+In addition, by analysing multiple genome assemblies simultaneously, the pipeline aims to recover a good consensus sequence for each TE family present in the species rather than a family consensus for each strain. 
+Because the resulting library represents species-level consensus sequences rather than strain-specific variants, it is particularly well suited for genome annotation. However, analyses that rely on precise sequence divergence, such as RepeatMasker landscape analyses used to infer the relative ages of TE insertions, may be influenced by this approach.
+
+The pipeline adopts a conservative strategy. Candidate sequences lacking detectable nucleotide or protein similarity to previously described transposable elements are excluded from the final library. 
+It is unlikely that a bona fide canonical TE would lack detectable similarity to any known TE at both the nucleotide and protein levels. 
+Although some of these candidates may represent genuine non-canonical or highly divergent TEs, such elements are considered rare, and demonstrating their transposable nature generally requires extensive manual curation.
 
 The pipeline combines four complementary strategies:
 
-1. **RepeatModeler** performs de novo repeat discovery independently in each genome.
-2. Newly generated consensus sequences are compared against a curated species-specific TE library to remove families that have already been described.
+1. **RepeatModeler** performs de novo repeat discovery independently in each genome. 
+2. Newly generated consensus sequences are compared against a curated species-specific TE library to remove families that have already been described. 
 3. The remaining candidates are analysed with **MCHelper**, which extends consensus sequences, reconstructs TE boundaries, removes obvious false positives, and performs structural annotation.
 4. Curated candidates from all genomes are merged, dereplicated, and finally validated through nucleotide similarity (RepBase) and protein similarity (TE peptide database), producing a conservative set of candidate TE families suitable for manual inspection and incorporation into a curated TE library.
 
 By analysing multiple genomes simultaneously, the pipeline increases the probability of recovering TE families that may be absent, fragmented, or poorly assembled in any individual genome while avoiding redundant manual inspection of the same family recovered independently from different assemblies.
-
-## Pipeline assumptions
-
-This workflow is intended for analyses of multiple genome assemblies belonging to the same species.
-
-The pipeline assumes that:
-
-- a curated TE library already exists for the species. 
-- RepeatModeler consensus sequences are frequently fragmented or incomplete relative to curated TE consensuses;
-- canonical TE families are expected to retain detectable nucleotide and/or protein similarity to previously described TEs;
-- the objective is identifying bona-fide TEs rather than discover every repetitive sequence present in the genome.
-
-Consequently, the pipeline adopts a conservative strategy. Candidate sequences lacking detectable similarity to known TE nucleotide or protein sequences are excluded from the final library. While some of these sequences may represent genuine non-canonical TEs, demonstrating their transposable nature generally requires extensive manual investigation and falls outside the scope of this automated workflow.
 
 ## Required data
 
@@ -74,23 +63,19 @@ This pipeline identifies candidate transposable element (TE) sequences from geno
 
 The pipeline starts from:
 
-1. genome FASTA files;
-2. a curated TE library for the species or species group;
+1. Genome FASTA files;
+2. A curated TE library for the species or species group:
 This can be obtained from Repbase depending on the species. In this case, LTRs should be joined to the internal region. For species without an available curated TE library, this filtering step can be effectively skipped by providing a FASTA file containing a single dummy sequence. In this case, all RepeatModeler candidate families are retained for downstream analyses. 
   Example:
 ```fasta
 >dummy_TE
 NNNNNNNNNN
 ```
-3. a RepBase nucleotide library for final BLASTN searches;
-4. a TE peptide library, such as RepeatPeps.lib, for final BLASTX searches;
-5. a BUSCO lineage suitable for the organism being analysed.
-
-The final output is:
-
-```text
-final_TE_candidates_after_MCHelper/final_potential_new_TEs.fa
-```
+3. A RepBase nucleotide library for final BLASTN searches: 
+It can be obtained here: https://www.girinst.org/server/RepBase/index.php
+4. A TE peptide library, such as RepeatPeps.lib, for final BLASTX searches:
+It can be obtained here: https://raw.githubusercontent.com/rmhubley/RepeatMasker/master/Libraries/RepeatPeps.lib
+5. A BUSCO lineage suitable for the organism being analysed.
 
 ## Workflow Summary
 
@@ -106,6 +91,12 @@ The pipeline runs these steps:
 8. Search candidates against RepBase nucleotide sequences and TE peptides.
 9. Write the final FASTA for manual inspection.
 
+The final output is:
+
+```text
+final_TE_candidates_after_MCHelper/final_potential_new_TEs.fa
+```
+
 ## Dependencies
 
 The pipeline expects the following tools to be available through the environments defined in `config.sh`.
@@ -114,31 +105,20 @@ The pipeline expects the following tools to be available through the environment
 
 Required:
 
-- RepeatModeler
-- BuildDatabase
-- RepeatMasker
-- RMBlast
+- RepeatModeler and its dependencies
+https://github.com/Dfam-consortium/RepeatModeler
 
-Optional, only if `REPEATMODELER_USE_LTRSTRUCT="yes"`:
-
-- LTRStruct-compatible RepeatModeler installation
-- Any LTR-related tools required by that installation, such as GenomeTools, LTR_retriever, MAFFT, or TRF
+LTRStruct should be installed to use `REPEATMODELER_USE_LTRSTRUCT="yes"`:
 
 RepeatModeler versions use different thread options:
-
 - RepeatModeler 2.0.3 and older: `REPEATMODELER_THREADS_OPTION="-pa"`
 - RepeatModeler 2.0.4 and newer: `REPEATMODELER_THREADS_OPTION="-threads"`
 
 Check the version before running:
 
-```bash
-RepeatModeler -h | head
-```
-
 ### Filtering Steps
 
 Required for Step 2 and Step 4:
-
 - BLAST+
 - SeqKit
 - CD-HIT
@@ -146,6 +126,7 @@ Required for Step 2 and Step 4:
 These tools are used for BLAST searches, FASTA extraction, BLAST database creation, and redundancy reduction.
 
 ### MCHelper Step
+https://github.com/GonzalezLab/MCHelper
 
 Required:
 
@@ -153,20 +134,6 @@ Required:
 - Python environment required by MCHelper
 - BUSCO lineage appropriate for the species being analysed
 
-For example, an *Aspergillus* analysis should use a fungal BUSCO lineage such as Eurotiales, not an animal lineage.
-
-### Reference Files
-
-Required input reference files:
-
-- curated TE library for the species or species group
-- RepBase nucleotide library for final BLASTN searches
-- TE peptide library, such as `RepeatPeps.lib`, for final BLASTX searches
-- BUSCO HMM lineage file for MCHelper
-
-### SLURM Mode
-
-The SLURM execution mode also requires the `sbatch` command and a working SLURM scheduler.
 
 ## Installation
 
@@ -231,49 +198,12 @@ If your genomes are already stored somewhere else, change only `GENOME_DIR`:
 GENOME_DIR="/path/to/genome_fastas"
 ```
 
-If your genome names have a longer suffix, adjust both `GENOME_GLOB` and `GENOME_SUFFIX`.
+Adjust the genome file suffix; `GENOME_GLOB` and `GENOME_SUFFIX`.
 
-Example:
-
-```bash
-GENOME_GLOB="*_renamed_only_chrom.fna"
-GENOME_SUFFIX="_renamed_only_chrom.fna"
-```
-
-For this file:
-
-```text
-GCA_020501695_renamed_only_chrom.fna
-```
-
-the genome ID will be:
-
-```text
-GCA_020501695
-```
 
 ## Configure Software Environments
 
-Edit the environment names or paths in `config.sh`:
-
-```bash
-REPEATMODELER_ENV="repeatmodeler"
-FILTERING_ENV="te_filtering"
-MCHELPER_ENV="mchelper"
-```
-
-The environment loading functions are also in `config.sh`:
-
-```bash
-load_repeatmodeler_environment() {
-    set +u
-    source "$(conda info --base)/etc/profile.d/conda.sh"
-    conda activate "$REPEATMODELER_ENV"
-    set -u
-}
-```
-
-Use the same pattern for the filtering and MCHelper environments. The `set +u` and `set -u` lines are intentional because some conda activation scripts use variables that may be undefined under strict Bash mode.
+Edit the environment names or paths in `config.sh`
 
 
 ## Verify dependencies (recommended)
@@ -297,32 +227,14 @@ The repository supports two execution modes.
 
 ### Local Bash Mode
 
-Use this mode for small tests, interactive compute nodes, or clusters where you do not want to submit SLURM jobs.
-
 ```bash
 bash run_TE_pipeline.sh
 ```
 
 ### SLURM Mode
 
-Use this mode on SLURM clusters. The launcher submits RepeatModeler and MCHelper as arrays and submits later steps with job dependencies.
-
 ```bash
 bash slurm/run_pipeline_slurm.sh
-```
-
-SLURM resources are configured in the `SLURM settings` section of `config.sh`. The SLURM scripts are examples and may require adaptation to local HPC policies, for example account names, QoS names, modules, or partition names.
-
-Both execution modes write logs in:
-
-```text
-logs/
-```
-
-SLURM job logs are written in:
-
-```text
-logs/slurm/
 ```
 
 The pipeline creates these output directories:
@@ -436,32 +348,6 @@ Final output:
 final_TE_candidates_after_MCHelper/final_potential_new_TEs.fa
 ```
 
-## Quick Checks
-
-Check the genome table:
-
-```bash
-column -t config/genomes.tsv | less -S
-```
-
-Check Step 2 summary:
-
-```bash
-column -t TE_candidate_screen_original_headers/summary.tsv | less -S
-```
-
-Check MCHelper input table:
-
-```bash
-column -t config/mchelper_inputs.tsv | less -S
-```
-
-Count final candidates:
-
-```bash
-grep -c "^>" final_TE_candidates_after_MCHelper/final_potential_new_TEs.fa
-```
-
 ## Final curation
 
 The purpose of this pipeline is to identify **high-confidence candidate TE families** that are absent from an existing curated TE library. Although the workflow applies multiple filtering and validation steps, the final FASTA (`final_potential_new_TEs.fa`) should be considered a collection of **candidate** TEs rather than a finished TE library.
@@ -470,32 +356,34 @@ Recommended validation steps include:
 
 1. **Inspect TE structure**
 
-   - Use **TE-Aid** to visualize the candidate, inspect its genomic distribution, evaluate terminal repeats (TIRs or LTRs), target site duplications (TSDs), and coding potential.
+   - Use **TE-Aid** to visualise the candidate, inspect its genomic distribution, evaluate terminal repeats (TIRs or LTRs), target site duplications (TSDs), and coding potential.
+   - If the TE consensus is still not complete, the pipeline can be rerun, excluding step 1 (repeatmodeler) and increasing the size of flanking regions or the number of iterative extensions for MCHelper. A manual consensus retrieval for specific consensus can also be obtained manually following Goubert et al 2022 (https://pmc.ncbi.nlm.nih.gov/articles/PMC8969392/).
+   
 
 2. **Search for conserved protein domains**
 
    - Analyse predicted ORFs using **NCBI CD-Search** (or an equivalent conserved domain database) to identify domains characteristic of transposable elements (e.g. reverse transcriptase, integrase, RNase H, transposase, endonuclease, helicase).
 
-3. **Compare with known TE families**
+4. **Compare with known TE families**
 
    - Search the candidate against RepBase, Dfam, or other TE databases to determine whether it represents a highly divergent member of a known family or a potentially novel family.
 
-4. **Verify TE classification**
+5. **Verify TE classification**
 
-   - Although MCHelper provides an initial structural classification, this assignment should always be manually confirmed. In some cases, MCHelper may assign an incorrect order or superfamily. Structural features, conserved domains, and sequence similarity should all be considered before assigning a final classification.
+   - Although MCHelper provides an initial structural classification, this assignment should always be manually confirmed. In some cases, MCHelper may assign an incorrect order or superfamily. Structural features, conserved domains, and sequence similarity should all be considered before assigning a final classification. 
 
 
 Only candidates confirmed as bona fide TEs should be added to the original curated TE library. The resulting updated library can then be used for downstream applications such as genome annotation.
 
 ## Limitations
 
-This pipeline is designed to identify canonical TE families supported by nucleotide and/or protein homology.
+This pipeline is designed to identify canonical TE families supported by nucleotide and/or protein similarity.
 
 Highly divergent or non-canonical TEs lacking detectable similarity to known TE sequences may not be retained. Such elements require dedicated manual investigation and are outside the scope of this workflow.
 
 ## References
 
-This pipeline relies on the following softwares:
+This pipeline relies on the following software:
 | Software | Repository / Website |
 |-----------|----------------------|
 | RepeatModeler | https://github.com/Dfam-consortium/RepeatModeler |
