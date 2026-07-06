@@ -5,6 +5,7 @@
 #SBATCH --time=04:00:00
 #SBATCH --output=logs/slurm/%x_%j.out
 #SBATCH --error=logs/slurm/%x_%j.err
+#SBATCH --partition=low
 
 set -euo pipefail
 

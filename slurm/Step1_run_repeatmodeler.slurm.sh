@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=TE_step1_repeatmodeler
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=64
 #SBATCH --mem=64G
 #SBATCH --time=48:00:00
 #SBATCH --output=logs/slurm/%x_%j.out
 #SBATCH --error=logs/slurm/%x_%j.err
+#SBATCH --partition=low
 
 set -euo pipefail
 

@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 #SBATCH --job-name=TE_step4_final_filter
-#SBATCH --cpus-per-task=16
-#SBATCH --mem=32G
+#SBATCH --cpus-per-task=32
+#SBATCH --mem=64G
 #SBATCH --time=08:00:00
 #SBATCH --output=logs/slurm/%x_%j.out
 #SBATCH --error=logs/slurm/%x_%j.err
+#SBATCH --partition=low
 
 set -euo pipefail
 
