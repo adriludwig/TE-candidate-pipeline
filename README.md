@@ -36,17 +36,15 @@ flowchart LR
 
 ## Introduction
 
-Building a comprehensive transposable element (TE) library is a critical first step for accurate genome annotation. Although RepeatModeler is widely used for de novo TE discovery, its output typically contains a mixture of known TE families, 
-fragmented consensus sequences, gene fragments, simple repeats, and other non-TE sequences. Consequently, substantial manual curation is usually required before the resulting library can be used for proper annotation of the TEs in the genomes. 
+Building a comprehensive transposable element (TE) library is a critical first step for accurate genome annotation. Although RepeatModeler is widely used for de novo TE discovery, its output typically contains a mixture of known TE families, fragmented consensus sequences, gene fragments, simple repeats, and other non-TE sequences. Consequently, substantial manual curation is usually required before the resulting library can be used for proper annotation of the TEs in the genomes. 
 
-This pipeline was developed to automate the identification of high-confidence candidate TE families across multiple genome assemblies of the same species while minimising the amount of manual curation required.
+This pipeline was developed to automate the identification of high-confidence candidate TE families across multiple genome assemblies of the same species while minimising the amount of manual curation required. The final output is a FASTA library of candidate TEs that should be manually inspected and validated before being incorporated into a curated TE library for downstream analysis.
 
-In addition, by analysing multiple genome assemblies simultaneously, the pipeline aims to recover a good consensus sequence for each TE family present in the species rather than a family consensus for each strain. 
-Because the resulting library represents species-level consensus sequences rather than strain-specific variants, it is particularly well suited for genome annotation. However, analyses that rely on precise sequence divergence, such as RepeatMasker landscape analyses used to infer the relative ages of TE insertions, may be influenced by this approach.
+Analysing multiple genomes also provides a more comprehensive representation of the mobilome present in the species pangenome, increasing the probability of recovering TE families that may be absent, fragmented, or poorly assembled in any individual genome while avoiding redundant manual inspection of the same family recovered independently from different assemblies.
 
-The pipeline adopts a conservative strategy. Candidate sequences lacking detectable nucleotide or protein similarity to previously described transposable elements are excluded from the final library. 
-It is unlikely that a bona fide canonical TE would lack detectable similarity to any known TE at both the nucleotide and protein levels. 
-Although some of these candidates may represent genuine non-canonical or highly divergent TEs, such elements are considered rare, and demonstrating their transposable nature generally requires extensive manual curation.
+This approach is well suited for genome annotation. However, analyses that rely on precise sequence divergence, such as RepeatMasker landscape analyses used to infer the relative ages of TE insertions, may be influenced by this approach.
+
+Moreover, the pipeline adopts a conservative strategy. Candidate sequences lacking detectable nucleotide or protein similarity to previously described TEs are excluded from the final library.  This is because it is unlikely that a bona fide canonical TE would lack detectable similarity to any known TE at both the nucleotide and protein levels Although some of these candidates may represent genuine non-canonical or highly divergent TEs, such elements are considered rare, and demonstrating their transposable nature generally requires extensive manual curation.
 
 The pipeline combines four complementary strategies:
 
@@ -55,7 +53,6 @@ The pipeline combines four complementary strategies:
 3. The remaining candidates are analysed with **MCHelper**, which extends consensus sequences, reconstructs TE boundaries, removes obvious false positives, and performs structural annotation.
 4. Curated candidates from all genomes are merged, dereplicated, and finally validated through nucleotide similarity (RepBase) and protein similarity (TE peptide database), producing a conservative set of candidate TE families suitable for manual inspection and incorporation into a curated TE library.
 
-By analysing multiple genomes simultaneously, the pipeline increases the probability of recovering TE families that may be absent, fragmented, or poorly assembled in any individual genome while avoiding redundant manual inspection of the same family recovered independently from different assemblies.
 
 ## Required data
 
