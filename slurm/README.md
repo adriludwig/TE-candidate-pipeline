@@ -3,6 +3,13 @@
 This folder contains an independent SLURM version of the TE candidate discovery
 pipeline.
 
+These SLURM scripts were adapted for the cluster environment used during testing.
+Software modules, micromamba paths, container paths, environment names, file
+paths, and SLURM resource settings may not match other HPC systems.
+
+Before running the pipeline on another cluster, users should review and edit the
+files in the `slurm/` folder as needed.
+
 If you run the SLURM version, edit and use only the files inside `slurm/`.
 The non-SLURM scripts in the main folder are not required.
 
