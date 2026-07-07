@@ -30,6 +30,7 @@ flowchart LR
 - [Verify dependencies](#verify-dependencies-recommended)
 - [Run the pipeline](#run-the-pipeline)
 - [Step outputs](#step-outputs)
+- [Summarize a completed run](#summarize-a-completed-run)
 - [Final curation](#final-curation)
 - [Limitations](#limitations)
 - [References](#references)
@@ -152,6 +153,7 @@ TE-candidate-pipeline/
 ├── config.sh
 ├── check_dependencies.sh
 ├── run_TE_pipeline.sh
+├── summarize_TE_pipeline_run.sh
 ├── 00_prepare_genome_table.sh
 ├── 02_prepare_mchelper_table.sh
 ├── Step1_run_repeatmodeler_loop.sh
@@ -161,14 +163,21 @@ TE-candidate-pipeline/
 ├── TE_candidate_pipeline_original_headers.sh
 └── slurm/
     ├── README.md
+    ├── config.sh
+    ├── check_dependencies.sh
     ├── run_pipeline_slurm.sh
-    ├── Step1_run_repeatmodeler_array.slurm
-    ├── Step2_run_TE_candidates_original_headers.slurm
-    ├── Step3_run_mchelper_array.slurm
-    └── Step4_run_final_TE_filter_after_MCHelper.slurm
+    ├── 00_prepare_genome_table.sh
+    ├── 02_prepare_mchelper_table.sh
+    ├── Step1_run_repeatmodeler.slurm.sh
+    ├── Step2_run_TE_candidates_original_headers.slurm.sh
+    ├── Step3_run_mchelper.slurm.sh
+    ├── Step4_run_final_TE_filter_after_MCHelper.slurm.sh
+    └── TE_candidate_pipeline_original_headers.sh
 ```
 
-Input genomes, the curated TE library and the required databases can be stored anywhere on your system. Their locations should be specified in `config.sh`.
+Input genomes, the curated TE library and the required databases can be stored
+anywhere on your system. Their locations should be specified in `config.sh` for
+local Bash runs or in `slurm/config.sh` for SLURM runs.
 
 ## Configure the Pipeline
 
@@ -345,6 +354,42 @@ Final output:
 final_TE_candidates_after_MCHelper/final_potential_new_TEs.fa
 ```
 
+## Summarize a Completed Run
+
+After the pipeline finishes, basic run statistics can be collected with:
+
+```bash
+bash summarize_TE_pipeline_run.sh
+```
+
+By default, this creates:
+
+```text
+run_basic_stats/
+├── summary.tsv
+├── repeatmodeler_consensi_counts.tsv
+├── pre_mchelper_candidate_counts.tsv
+└── mchelper_refined_candidate_counts.tsv
+```
+
+Optionally, a custom output directory can be provided:
+
+```bash
+bash summarize_TE_pipeline_run.sh my_stats_folder
+```
+
+The summary includes:
+
+- number of input genomes;
+- number of RepeatModeler consensus sequences per genome;
+- number of potential new TE candidates before MCHelper;
+- number of refined candidate sequences after MCHelper;
+- number and length statistics for the final retained candidate TE sequences.
+
+The script should be run from the main pipeline output directory, where folders
+such as `repeatmodeler_more_genomes/`, `TE_candidate_screen_original_headers/`,
+`MCHelper_newTEs/`, and `final_TE_candidates_after_MCHelper/` are located.
+
 ## Final curation
 
 The purpose of this pipeline is to identify **high-confidence candidate TE families** that are absent from an existing curated TE library. Although the workflow applies multiple filtering and validation steps, the final FASTA (`final_potential_new_TEs.fa`) should be considered a collection of **candidate** TEs rather than a finished TE library.
@@ -353,7 +398,7 @@ Recommended validation steps include:
 
 1. **Inspect TE structure**
 
-   - Use **TE-Aid** to visualise the candidate, inspect its genomic distribution, evaluate terminal repeats (TIRs or LTRs), target site duplications (TSDs), and coding potential.
+   - Use **TE-Aid** (https://github.com/clemgoub/TE-Aid/) to visualise the candidate, inspect its genomic distribution, evaluate terminal repeats (TIRs or LTRs), target site duplications (TSDs), and coding potential.
    - If the TE consensus is still not complete, the pipeline can be rerun, excluding step 1 (repeatmodeler) and increasing the size of flanking regions or the number of iterative extensions for MCHelper. A manual consensus retrieval for specific consensus can also be obtained manually following Goubert et al 2022 (https://pmc.ncbi.nlm.nih.gov/articles/PMC8969392/).
    
 
