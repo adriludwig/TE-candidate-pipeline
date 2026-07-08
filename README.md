@@ -45,7 +45,7 @@ Analysing multiple genomes also provides a more comprehensive representation of 
 
 This approach is well suited for genome annotation. However, analyses that rely on precise sequence divergence, such as RepeatMasker landscape analyses used to infer the relative ages of TE insertions, may be influenced by this approach.
 
-Moreover, the pipeline adopts a conservative strategy. Candidate sequences lacking detectable nucleotide or protein similarity to previously described TEs are excluded from the final library.  This is because it is unlikely that a bona fide canonical TE would lack detectable similarity to any known TE at both the nucleotide and protein levels Although some of these candidates may represent genuine non-canonical or highly divergent TEs, such elements are considered rare, and demonstrating their transposable nature generally requires extensive manual curation.
+Moreover, the pipeline adopts a conservative strategy. Candidate sequences lacking detectable nucleotide or protein similarity to previously described TEs are excluded from the final library.  This is because it is unlikely that a bona fide canonical TE would lack detectable similarity to any known TE at both the nucleotide and protein levels. Although some of these candidates may represent genuine non-canonical or non-autonomous TEs, demonstrating their transposable nature generally requires extensive manual curation.
 
 The pipeline combines four complementary strategies:
 
