@@ -141,9 +141,9 @@ CDHIT_LONGER_COVERAGE="0.80"
 # Thread settings
 ###############################################################################
 
-REPEATMODELER_THREADS="16"
-FILTER_THREADS="16"
-MCHELPER_THREADS="16"
+REPEATMODELER_THREADS="64"
+FILTER_THREADS="32"
+MCHELPER_THREADS="64"
 
 ###############################################################################
 # RepeatModeler settings
