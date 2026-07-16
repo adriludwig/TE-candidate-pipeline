@@ -13,6 +13,7 @@ files in the `slurm/` folder as needed.
 If you run the SLURM version, edit and use only the files inside `slurm/`.
 The non-SLURM scripts in the main folder are not required.
 
+
 ## Files
 
 ```text
@@ -56,8 +57,11 @@ Edit SLURM resources in the header of each `.slurm.sh` script:
 #SBATCH --mem=64G
 #SBATCH --time=48:00:00
 ```
-
 ## How to Run
+
+Before submitting the SLURM pipeline, make sure the helper scripts are executable. If needed, run:
+
+chmod +x slurm/*.sh
 
 Run all commands from the pipeline run directory, the same directory that
 contains the `slurm/` folder.
