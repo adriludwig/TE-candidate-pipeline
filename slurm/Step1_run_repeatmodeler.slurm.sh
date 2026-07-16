@@ -40,8 +40,10 @@ if [[ "${REPEATMODELER_THREADS_OPTION}" != "-pa" && "${REPEATMODELER_THREADS_OPT
     exit 1
 fi
 
+set +u
 module purge || true
 module load singularity >/dev/null 2>&1 || module load apptainer >/dev/null 2>&1 || true
+set -u
 
 TETOOLS_SIF="${TETOOLS_SIF:-${SHARED:-/shared}/containers/dfam-tetools-latest.sif}"
 TETOOLS_CONTAINER_CMD="${TETOOLS_CONTAINER_CMD:-singularity}"

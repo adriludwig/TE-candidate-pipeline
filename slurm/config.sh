@@ -37,8 +37,8 @@ GENOME_DIR="${PROJECT_DIR}"
 #   GENOME_GLOB finds all genome FASTA files.
 #   GENOME_SUFFIX is removed from the file name to create the genome ID.
 #   
-GENOME_GLOB="*.fna" 
-GENOME_SUFFIX=".fna"
+GENOME_GLOB="*_renamed.fna" 
+GENOME_SUFFIX="_renamed.fna"
 
 ###############################################################################
 # TE libraries and MCHelper inputs
@@ -48,7 +48,7 @@ GENOME_SUFFIX=".fna"
 # This can be obtained from Repbase depending on the species. In this case, LTRs should be
 # joined to the internal region.
 # Edit the file name for your curated library.
-CURATED_TE_LIBRARY="${PROJECT_DIR}/Af_curated_TE_lib1.0.fa"
+CURATED_TE_LIBRARY="${PROJECT_DIR}/fake_lib.fasta"
 
 # BUSCO lineage used by MCHelper.
 # Check the best BUSCO database to your species
@@ -71,11 +71,11 @@ MCHELPER_PY="/home/aludwig/hc-storage/bin/MCHelper/MCHelper.py"
 
 # RepBase nucleotide library used by BLASTN in the final filtering step.
 # Edit this path if your RepBase file is stored somewhere else.
-REPBASE_NT_FASTA="${PROJECT_DIR}/db/RepBase31.06.fasta/RepBase31.06.fasta"
+REPBASE_NT_FASTA="/home/aludwig/hc-storage/db_TEs/RepBase31.06.fasta/RepBase31.06.fasta"
 
 # TE peptide library, for example RepeatPeps.lib, used by BLASTX in the final
 # filtering step. Edit this path if your peptide file is stored somewhere else.
-TE_PEP_FASTA="${PROJECT_DIR}/db/RepeatPeps.lib"
+TE_PEP_FASTA="/home/aludwig/hc-storage/db_TEs/RepeatPeps.lib"
 
 ###############################################################################
 # Output directories
@@ -194,7 +194,7 @@ REPEATMODELER_USE_LTRSTRUCT="yes"
 # extension into surrounding genomic regions.
 
 MCHELPER_X="2"
-MCHELPER_EXTENSION="2000"
+MCHELPER_EXTENSION="3000"
 
 ###############################################################################
 # SLURM settings
@@ -261,10 +261,14 @@ TETOOLS_SIF="${SHARED:-/shared}/containers/dfam-tetools-latest.sif"
 TETOOLS_CONTAINER_CMD="apptainer"
 
 load_repeatmodeler_environment() {
+    set +u
+
     module purge || true
 
     # Load the container runtime. Keep the one that exists on your cluster.
     module load apptainer || module load singularity || true
+
+    set -u
 
     if ! command -v "${TETOOLS_CONTAINER_CMD}" >/dev/null 2>&1; then
         echo "ERROR: container command not found: ${TETOOLS_CONTAINER_CMD}" >&2
@@ -304,6 +308,8 @@ EOF
 ###############################################################################
 
 load_filtering_environment() {
+    set +u
+
     module purge || true
 
     module load ncbi-blast/2.12.0
@@ -311,6 +317,10 @@ load_filtering_environment() {
 
     # Keep the module name that exists on your cluster.
     module load cd-hit || module load cd-hit-est || true
+
+    set -u
+
+    echo "Filtering environment:"
 
     if ! command -v makeblastdb >/dev/null 2>&1; then
         echo "ERROR: makeblastdb not found after loading filtering modules." >&2
@@ -336,6 +346,12 @@ load_filtering_environment() {
         echo "ERROR: cd-hit-est not found after loading filtering modules." >&2
         exit 1
     fi
+
+    echo "  makeblastdb: $(command -v makeblastdb)"
+    echo "  blastn:      $(command -v blastn)"
+    echo "  blastx:      $(command -v blastx)"
+    echo "  seqkit:      $(command -v seqkit)"
+    echo "  cd-hit-est:  $(command -v cd-hit-est)"
 }
 
 ###############################################################################
@@ -343,6 +359,8 @@ load_filtering_environment() {
 ###############################################################################
 
 load_mchelper_environment() {
+    set +u
+
     module purge || true
 
     export MAMBA_ROOT_PREFIX="/home/aludwig/hc-storage/micromamba"
@@ -353,7 +371,6 @@ load_mchelper_environment() {
         exit 1
     fi
 
-    set +u
     eval "$("${MAMBA_EXE}" shell hook --shell bash --root-prefix "${MAMBA_ROOT_PREFIX}")"
     micromamba activate mchelper
     set -u
